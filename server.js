@@ -19,6 +19,13 @@ function normalizeRoomId(roomId) {
   return s ? s.slice(0, 64) : '';
 }
 
+function relayToJoinedRooms(socket, eventName, data) {
+  const rooms = [...socket.rooms].filter((r) => r !== socket.id);
+  for (const room of rooms) {
+    io.to(room).emit(eventName, data);
+  }
+}
+
 io.on('connection', (socket) => {
   socket.on('join-room', (roomId) => {
     const id = normalizeRoomId(roomId);
@@ -30,12 +37,8 @@ io.on('connection', (socket) => {
     console.log('User joined room:', id);
   });
 
-  socket.on('gyro-data', (data) => {
-    const rooms = [...socket.rooms].filter((r) => r !== socket.id);
-    for (const room of rooms) {
-      io.to(room).emit('gyro-data', data);
-    }
-  });
+  socket.on('gyro-data', (data) => relayToJoinedRooms(socket, 'gyro-data', data));
+  socket.on('gyro-calibrate', (data) => relayToJoinedRooms(socket, 'gyro-calibrate', data));
 });
 
 server.listen(PORT, '0.0.0.0', () => {
