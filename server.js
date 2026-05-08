@@ -39,6 +39,7 @@ io.on('connection', (socket) => {
 
   socket.on('gyro-data', (data) => relayToJoinedRooms(socket, 'gyro-data', data));
   socket.on('gyro-calibrate', (data) => relayToJoinedRooms(socket, 'gyro-calibrate', data));
+  socket.on('gyro-zoom', (data) => relayToJoinedRooms(socket, 'gyro-zoom', data));
 });
 
 server.listen(PORT, '0.0.0.0', () => {
